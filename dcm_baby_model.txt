@@ -1,0 +1,8 @@
+vois: VOI_ACC_centered VOI_DLPFC_LH 
+inputs: Instructions Stimuli Switch Irrelevant
+
+# COMMON ARCHITECTURE:
+## Intrinsic Connectivity / A
+
+ACC_centered -> DLPFC_LH
+

@@ -1,0 +1,3 @@
+#!/bin/bash
+
+matlab -nosplash -r "addpath(genpath('/usr/local/var/spm8')); spm fmri"

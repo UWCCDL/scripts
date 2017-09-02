@@ -1,0 +1,9 @@
+#!/bin/bash
+
+#subj=$1
+for subj in $@; do
+    mkdir $subj
+    cd $subj
+    mkdir raw results behav struct
+    cd ..
+done

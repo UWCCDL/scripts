@@ -1,0 +1,88 @@
+
+[1mUsage(B[m
+-----
+
+  $ generate-correlation-analysis.sh <subj_results_dir> 
+                                     <group_results_dir>
+                                     <contrast_file>
+                                     <subjects_file>
+                                     <measures_file>
+Where:
+  
+  [1msubj_results_dir(B[m is the name of the folder where the SPM.mat 
+                     file will be placed for each subject (it 
+                     needs to already exist)
+  [1mgroup_results_dir(B[m is the name of the folder where the group 
+                      analysis and each contrast's SPM.mat file 
+                      will be placed. It will be created (together
+                      with the appropriate sub-folders) if it does
+                      not exist.
+  [1mcontrast_file(B[m is a file listing all the contrast names and their
+                  vectors, separated by : 
+  [1msubjects_file(B[m is a file listing all the subjects used in the
+                  analysis.
+  [1mmeasures_file(B[m is the name of a file containining the list of 
+                  subjects and a list of individual measures for 
+                  each of them. It can contain more subjects that 
+                  those listed in the subjects file. The measure
+                  file must have column names, and the first column
+                  must be the subject ID.
+
+Contrast File
+--------------
+A contrast file is a text file that contains contrast names and 
+vector values, one per line, in the form <NAME> : <VECTOR>. For 
+example:
+
+  Words > Pictures : 0 0 -0.5 -0.5 0 0.5 0.5 
+  Pictures > Words : 0 0 0.5 0.5 0 -0.5 -0.5 
+  ....
+The script assumes that the same contrast vector is used for
+each session, and will use SPM's 'Replicate&Scale' option when
+generating the contrasts. In some studies, this is not the case,
+so the script cannot be used.
+
+Subjects File
+-------------
+A subjects file is a text file that contains two columns: the 
+list of subjects ID (corresponding to the subjects' data 
+folders) and the group they belong to. One group must always
+be specified, even as a placeholder (e.g., '1' or 'x'). If
+two groups are indicated, the script will model all the
+contrasts within each group, as well as all the group 
+comparsisons within each contrast. A subject file might 
+look like this:
+ 
+  11011   Bilingual
+  11012   Monolingual
+  11015   Bilingual
+  ...     ...
+
+Measures file
+-------------
+A measures file is a file that contains a set of individual
+measures for each participant. These measures will be used as
+covariates against fMRI data in a linear regression analysis.
+Each measure needs to be a number (obviously), and needs to
+be separated by spaces.
+The file is organized as a named matrix (something like a 
+'dataframe' in R), where each colum represents a variable and 
+each row represents a subject. The first row must contain the
+column names. Finally, the first column MUST contain the subject
+names.  For example:
+
+  Subject IQ   OpSpan ReadSpan
+  11011   200  29     34
+  11012   150  70     48
+  11015   100  68     68
+  ...     ...  ...    ...
+
+Summary
+-------
+
+  $ generate-correlation-analysis.sh <subj_results_dir> 
+                                     <group_results_dir>
+                                     <contrast_file>
+                                     <subjects_file>
+                                     <measures_file>
+

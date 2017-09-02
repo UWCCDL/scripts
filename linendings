@@ -1,0 +1,42 @@
+#!/usr/bin/perl
+## ---------------------------------------------------------------- ##
+## LINENDINGS
+## ---------------------------------------------------------------- ##
+## Converts text files to the specified line endings format.
+##
+## Author: T.R. Fullhart, kayos@kayos.org
+## ---------------------------------------------------------------- ##
+## Usage:
+## $ linendings -[unix|dos|mac] file1 file2 ... fileN.,
+## ---------------------------------------------------------------- ##
+
+my $lineending = "\n";
+
+my $type = shift @ARGV;
+
+if( $type =~ /unix/ ) {
+    $lineending = "\012";
+} elsif( $type =~ /dos/ ) {
+    $lineending = "\015\012";
+} elsif( $type =~ /mac/ ) {
+    $lineending = "\015";
+} else {
+    print "Usage: $0 --unix|--dos|--mac\n";
+    exit 1;
+}
+
+my @files = @ARGV;
+
+for my $file ( @files ) {
+    open FILE, $file or next;        # thanks turnstep
+    my @lines = <FILE>;
+    close FILE;
+    
+    foreach my $i ( 0..$#lines ) {
+	$lines[$i] =~ s/(\012|\015\012?)/$lineending/g;
+    }
+    
+    open FILE,">$file";
+    print FILE @lines;
+    close FILE;
+}

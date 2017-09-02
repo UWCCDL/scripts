@@ -1,0 +1,14 @@
+#/bin/bash
+
+i=1
+for f in rp*; do
+    name=`echo $f | cut -f1 -d.`
+    name=`echo $name | cut -f2 -d_`
+    1dplot -one -xlabel "scans" -ylabel "Translation (mm)" -jpgs 800 "${name}_xyz.jpg"  ${f}[0-2]
+    
+    1dmatcalc "&read(${f}[3-5]) 57.324 *  &write(-)" > radpry
+    
+    1dplot -one -xlabel "scans" -ylabel "Rotation (deg)" -jpgs 800 "${name}_pry.jpg" radpry
+    
+    rm radpry
+done
