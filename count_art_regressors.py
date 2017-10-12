@@ -15,7 +15,6 @@ Where:
 
 The scripts prints out the number of outliers included in
 the file.
-
 """
 
 def count_outliers(artfile):
@@ -25,7 +24,7 @@ def count_outliers(artfile):
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print HLP_MSG
+        print(HLP_MSG)
     else:
         filename = sys.argv[1]
         print(count_outliers(filename))
