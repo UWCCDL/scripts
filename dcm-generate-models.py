@@ -13,15 +13,18 @@
 #
 # --- History ------------------------------------------------------ #
 #
-# 2017-11-14 : Added support for TE values
-# 2015-11-08 : Made sure inputs are not centered (in DCM10). Also,
-#            : fixed a bug on the doc string.
+# 2017-11-14 : * Added support for TE values
+#              * Added support for loading model files from different 
+#                folders
 #
-# 2012-09-20 : Added documentation string
+# 2015-11-08 : * Made sure inputs are not centered (in DCM10). Also,
+#            : * fixed a bug on the doc string.
 #
-# 2012-08-12 : First working version.
+# 2012-09-20 : * Added documentation string
 #
-# 2012-08-01 : File created.
+# 2012-08-12 : * First working version.
+#
+# 2012-08-01 : * File created.
 # ------------------------------------------------------------------ #
 
 HLP_MSG="""
@@ -112,7 +115,7 @@ i.e. in order to describe 'A -> B -> C', you need to have specified
 'B -> C' first.
 """
 
-import sys, copy, os
+import sys, copy, os, ntpath
 
 
 def isDefinitionString(strng):
@@ -318,7 +321,7 @@ Parses a file in the Model Definition Format and transforms it into
 an abstract representation of the model.
     """
 
-    name = fileName
+    name = ntpath.basename(fileName)
     if '.' in fileName:
         name = fileName[0:fileName.rindex('.')]
     
