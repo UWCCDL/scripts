@@ -322,8 +322,8 @@ an abstract representation of the model.
     """
 
     name = ntpath.basename(fileName)
-    if '.' in fileName:
-        name = fileName[0:fileName.rindex('.')]
+    if '.' in name:
+        name = name[0:name.rindex('.')]
     
     V = [] # VOIs
     I = [] # Inputs
