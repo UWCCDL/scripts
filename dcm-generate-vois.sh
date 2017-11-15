@@ -83,23 +83,23 @@ HLP_MSG='
     peak (1).'
 
 VOI_FILE=$1
-MFILE=`pwd`/create_vois_${VOI_FILE}_`date +%Y_%m_%d_%H%M`.m
+#MFILE=`pwd`/create_vois_${VOI_FILE}_`date +%Y_%m_%d_%H%M`.m
 BASE_DIR="`pwd`"
 NL="
 "   # new line
 SEP="---------------------------------------------------------------------"
 
 if [ $# -lt 1 ]; then
-    echo -e $HLP_MSG
+    echo -e $HLP_MSG >&2
     exit
 fi
 if [ -e ${VOI_FILE} ]; then
-    echo "% DCMs for $@" > $MFILE
+    echo "% DCMs for $@"
 
     #unset $@[1]  # Remove the first thing---it's the file
     shift;
     for subj in $@; do
-	echo "Matlab code for subject $subj"
+	echo "Matlab code for subject $subj" >&2
 	while read voi_info; do
 	    
 	    #Read region by region
@@ -112,38 +112,38 @@ if [ -e ${VOI_FILE} ]; then
 	    threshold=`echo ${voi_info} | awk '{print $7}'`
 	    moveable=`echo ${voi_info} | awk '{print $8}'`
 	    contrast="GoNoGo"
-	    echo "    matlab code for region ${name}" 
+	    echo "    matlab code for region ${name}" >&2
 	    # Get the specific coordinates
 	    x=`echo ${coordinates} | cut -f1 -d,`
 	    y=`echo ${coordinates} | cut -f2 -d,`
 	    z=`echo ${coordinates} | cut -f3 -d,`
 
-	    echo "% EXTRACTING TIME SERIES: ${name}" >> $MFILE
-	    echo "%${SEP}" >> $MFILE
-	    echo "clear matlabbatch" >> $MFILE
-	    echo "disp('Creating ROI ${name} for subject ${subj}')" >> $MFILE
-	    echo "matlabbatch{1}.spm.util.voi.spmmat = cellstr(fullfile('${BASE_DIR}', '${subj}', '${results_dir}', 'SPM.mat'));" >> $MFILE
-	    echo "matlabbatch{1}.spm.util.voi.adjust = ${contrast_adj};  % Effects of Interest" >> $MFILE
-	    echo "matlabbatch{1}.spm.util.voi.session = 1; % Session 1 (no others)" >> $MFILE
-	    echo "matlabbatch{1}.spm.util.voi.name = '${name}';" >> $MFILE
-	    echo "matlabbatch{1}.spm.util.voi.roi{1}.spm.spmmat = {''}; % using SPM.mat above" >> $MFILE
-	    echo "matlabbatch{1}.spm.util.voi.roi{1}.spm.contrast = ${contrast_num};  % The contrast used to identify the VOI" >> $MFILE
-	    echo "matlabbatch{1}.spm.util.voi.roi{1}.spm.threshdesc = 'none'; % Uncorrected" >> $MFILE
-	    echo "matlabbatch{1}.spm.util.voi.roi{1}.spm.thresh = ${threshold}; % The threshold" >> $MFILE 
-	    echo "matlabbatch{1}.spm.util.voi.roi{1}.spm.extent = 0; % No voxel limit"  >> $MFILE
-	    echo "matlabbatch{1}.spm.util.voi.roi{2}.sphere.centre = [${x} ${y} ${z}]; % Seed point" >> $MFILE
-	    echo "matlabbatch{1}.spm.util.voi.roi{2}.sphere.radius = ${radius};" >> $MFILE
+	    echo "% EXTRACTING TIME SERIES: ${name}"
+	    echo "%${SEP}"
+	    echo "clear matlabbatch"
+	    echo "disp('Creating ROI ${name} for subject ${subj}')"
+	    echo "matlabbatch{1}.spm.util.voi.spmmat = cellstr(fullfile('${BASE_DIR}', '${subj}', '${results_dir}', 'SPM.mat'));"
+	    echo "matlabbatch{1}.spm.util.voi.adjust = ${contrast_adj};  % Effects of Interest"
+	    echo "matlabbatch{1}.spm.util.voi.session = 1; % Session 1 (no others)"
+	    echo "matlabbatch{1}.spm.util.voi.name = '${name}';"
+	    echo "matlabbatch{1}.spm.util.voi.roi{1}.spm.spmmat = {''}; % using SPM.mat above"
+	    echo "matlabbatch{1}.spm.util.voi.roi{1}.spm.contrast = ${contrast_num};  % The contrast used to identify the VOI"
+	    echo "matlabbatch{1}.spm.util.voi.roi{1}.spm.threshdesc = 'none'; % Uncorrected"
+	    echo "matlabbatch{1}.spm.util.voi.roi{1}.spm.thresh = ${threshold}; % The threshold" 
+	    echo "matlabbatch{1}.spm.util.voi.roi{1}.spm.extent = 0; % No voxel limit"
+	    echo "matlabbatch{1}.spm.util.voi.roi{2}.sphere.centre = [${x} ${y} ${z}]; % Seed point"
+	    echo "matlabbatch{1}.spm.util.voi.roi{2}.sphere.radius = ${radius};"
 	    
 	    if [ ${moveable} -eq 1 ]; then
-		echo "matlabbatch{1}.spm.util.voi.roi{2}.sphere.move.local.spm = ${moveable}; % Move to local max" >> $MFILE
-		echo "matlabbatch{1}.spm.util.voi.roi{2}.sphere.move.global.mask = ''; % none" >> $MFILE
+		echo "matlabbatch{1}.spm.util.voi.roi{2}.sphere.move.local.spm = ${moveable}; % Move to local max"
+		echo "matlabbatch{1}.spm.util.voi.roi{2}.sphere.move.global.mask = ''; % none"
 	    fi
 
-	    echo "matlabbatch{1}.spm.util.voi.expression = 'i1 & i2'; % Not sure why but it's needed" >> $MFILE 
-	    echo "spm_jobman('run',matlabbatch);" >> $MFILE
+	    echo "matlabbatch{1}.spm.util.voi.expression = 'i1 & i2'; % Not sure why but it's needed" 
+	    echo "spm_jobman('run',matlabbatch);"
 
 	done < $VOI_FILE
     done
 else
-    echo "VOI file does not exist: $1"
+    echo "VOI file does not exist: $1" >&2
 fi
