@@ -13,6 +13,7 @@
 #
 # --- History ------------------------------------------------------ #
 #
+# 2017-11-14 : Added support for TE values
 # 2015-11-08 : Made sure inputs are not centered (in DCM10). Also,
 #            : fixed a bug on the doc string.
 #
@@ -48,12 +49,14 @@ COMMENTS are introduced by the sharp sign '#', and behave very much
 like shell comments: Everything between the sharp sign and the end 
 of the line is ignored by the script.
 
-A MODEL DESCRIPTION file begins with two statements:
+A MODEL DESCRIPTION file begins with three statements:
 
+  te: <TE value>
   vois: <region1> <region2> ... <regionN>
   inputs: <input1> <input2> ... <inputN>
 
-Where <regionX> names an existing VOI, and <inputX> gives a name to
+Where <TE value> is the scanner's Echo Time (in secs; default is 
+0.021), <regionX> names an existing VOI, and <inputX> gives a name to
 the various conditions that are present in the single-subject SPM.mat 
 file (i.e., the task model).
 
@@ -114,7 +117,7 @@ import sys, copy, os
 
 def isDefinitionString(strng):
     """
-A definition string is a string of the form '<inputs|vois> : <list>'
+A definition string is a string of the form '<inputs|vois|te> : <vals>'
     """
     if strng.count(':') is not 1: 
         return False
@@ -261,9 +264,10 @@ def parseConnectivity(ln, vois=[], inputs=[]):
         raise Exception("Too many elements for connectivity: " % elms)
 
 class Model(object):
-    def __init__(self, vois, inputs, connections, name="Model1", participant="", dcmFolder="DCM"):
+    def __init__(self, vois, inputs, te, connections, name="Model1", participant="", dcmFolder="DCM"):
         self.vois = vois
         self.inputs = inputs
+        self.te = te
         self.connections = connections
         self.name = name
         self.participant = participant
@@ -321,7 +325,8 @@ an abstract representation of the model.
     V = [] # VOIs
     I = [] # Inputs
     C = [] # Connectivity
-    
+    TE = 0.021
+
     f = open(fileName, 'r')
     for line in f.readlines():
         line=line.strip()
@@ -337,6 +342,7 @@ an abstract representation of the model.
             if isDefinitionString(line):
                 # A definition string is a line of the form
                 # <inputs|vois> : <list>
+                # print("Found dfntn: %s" % line, file=sys.stderr) 
                 dfnt = parseDefinition(line)
                 if dfnt.command == "vois":
                     V = dfnt.arguments
@@ -345,6 +351,10 @@ an abstract representation of the model.
                 elif dfnt.command == "inputs":
                     I = dfnt.arguments
                     #print "INPUTS", I
+
+                elif dfnt.command == "te":
+                    TE = float(dfnt.arguments[0])
+                    #print("New TE is: %s" % TE, file=sys.stderr)
 
                 else:
                     raise Exception("Unknown definition parameter: %s" % dfnt.command)
@@ -369,7 +379,7 @@ an abstract representation of the model.
                 
             #print(line, isDefinitionString(line), isConnectivityString(line))
     #print C
-    return Model(vois=V, inputs=I, connections=C, name=name)
+    return Model(vois=V, inputs=I, te=TE, connections=C, name=name)
 
 def model_to_matlab(model):
     """
@@ -446,7 +456,7 @@ that can be used in an SPM script.
     # Set delays and TE
     print("\n% Set delays and TE (TE should be gotten from SPM?)\n")
     print("DCM.delays = repmat(SPM.xY.RT,%d,1);" % len(model.vois))
-    print("DCM.TE     = 0.021;")
+    print("DCM.TE     = %.3f;" % model.te)
 
     # Set other options
     if model.IsNonlinear():

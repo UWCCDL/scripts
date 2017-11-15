@@ -72,6 +72,7 @@
 #
 # History
 # -------
+#  2017-11-04 : * Fixed an error in the 'HLP' doc string.
 #
 #  2017-10-12 : * Generated as a fork of generate-first-level.sh
 #
@@ -116,7 +117,7 @@ is ignored).
 Contrast File
 --------------
 This scriopt requires a contrast file for each participant, to
-be place in the subject folder and be named 
+be placed in the subject folder and be named 
 'contrasts_<subj>.txt'. 
 A contrast file is a text file that contains contrast names and 
 vector values, one per line, in the form <NAME> : <VECTOR>. For 
@@ -152,7 +153,6 @@ rescaled nor repeated per session.
  -------
 
    $ generate-first-level.sh [param_file] <results_dir> 
-                             <contrast_file>
                              <subj1> <subj2>...<subjN>
 
 "
