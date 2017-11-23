@@ -111,7 +111,7 @@ if [ -e ${VOI_FILE} ]; then
 	    contrast_num=`echo ${voi_info} | awk '{print $6}'`
 	    threshold=`echo ${voi_info} | awk '{print $7}'`
 	    moveable=`echo ${voi_info} | awk '{print $8}'`
-	    contrast="GoNoGo"
+	    #contrast="GoNoGo"
 	    echo "    matlab code for region ${name}" >&2
 	    # Get the specific coordinates
 	    x=`echo ${coordinates} | cut -f1 -d,`
