@@ -333,8 +333,9 @@ for subj in "$@" ; do
     # Add F-contrast Effects of Interest
     echo "matlabbatch{$J}.spm.stats.con.consess{$C}.fcon.name = 'EoI';"
     echo "matlabbatch{$J}.spm.stats.con.consess{$C}.fcon.convec = {"
-    echo "                                                       [1 0"
-    echo "                                                        0 1]"
+    #echo "                                                       [1 0"
+    #echo "                                                        0 1]"
+    echo "                                                        eye(${C})"
     echo "                                                       }';"
 
     echo "matlabbatch{$J}.spm.stats.con.consess{$C}.fcon.sessrep = 'none';"
