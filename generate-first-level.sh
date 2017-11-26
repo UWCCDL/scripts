@@ -99,11 +99,6 @@
 #
 #  * Add ART outliers to the parameters (much more helpful than motion
 #    regression
-#  * Calculate the length of 4D nifti file from te header info, rather
-#    than the name. This ensures compatibility with BIDS format.
-#    Here is some simple bash code:
-#
-#    L=`fslinfo $file | cut grep dim4 | awk '{print $2}'`
 # ------------------------------------------------------------------ #
 
 HLP_MSG="
