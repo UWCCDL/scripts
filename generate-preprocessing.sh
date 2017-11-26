@@ -56,6 +56,9 @@
 #
 # History
 # -------
+#  2017-11-25 : * Implemented a new way to read the number of volumes
+#             :   In a 4D nifti file (based on FSLinfo).
+#
 #  2015-06-30 : * Fixed a line of code that was not compatible with
 #             :   new release of SPM8 
 #  
@@ -71,6 +74,10 @@
 #  2013-07-23 : * First version working
 #
 #  2013-07-22 : * File started.
+# ------------------------------------------------------------------ #
+# To-do's:                                                           
+#                                                                    
+#  * 
 # ------------------------------------------------------------------ #
 
 HLP_MSG="\n
@@ -177,8 +184,9 @@ for subj in $@; do
     for session in ${subj}[-_]*.nii; do
 	echo "% Session $session"
 	echo "{"
-	N=`echo $session | cut -f1 -d. | tail -c 4`
-	N=$(echo $N | sed 's/^0*//')   # Removes leading zeroes
+	#N=`echo $session | cut -f1 -d. | tail -c 4`
+	#N=$(echo $N | sed 's/^0*//')   # Removes leading zeroes
+	N=`fslinfo $file | cut grep dim4 | awk '{print $2}'`
 	#echo $N >&2
 	for ((image=1; image<N; ++image)); do 
 	    echo "'${base}/${subj}/raw/${session},${image}'"
