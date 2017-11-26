@@ -34,6 +34,12 @@
 #
 #   * REFERENCE_SLICE: The reference slice for slice-timing. By 
 #     default, REFERENCE_SLICE = 1.
+# 
+#   * FUNC_FOLDER: The name of the folder where the raw 
+#     functional data is stored. By default, FUNC_FOLDER = raw.
+#
+#   * STRUCT_FOLDER: The name of the folder where the structural
+#     images are stored. By default, STRUCT_FOLDER = struct
 #
 # ------------------------------------------------------------------ #
 # Notes
@@ -97,19 +103,25 @@ HLP_MSG="\n
   parameters, one per line, in the form <PARAM> = <VALUE>. The      \n
   following parameters are supported:                               \n
                                                                     \n
-    1. TR: the repetition time.  By default, TR = 2.                 \n
+    1. TR: the repetition time.  By default, TR = 2.                \n
                                                                     \n
-    2. NUM_SLICES: the number of horizontal slices. By default,      \n
+    2. NUM_SLICES: the number of horizontal slices. By default,     \n
       NUM_SLICES = 36.                                              \n
                                                                     \n
-    3. TA: time from first to last slice. If not specified, it       \n
+    3. TA: time from first to last slice. If not specified, it      \n
       is calculated as TR-TR/NUM_SLICES                             \n
                                                                     \n
-    4. SLICE_ORDER: The order of slices, from bottom to top. If      \n
+    4. SLICE_ORDER: The order of slices, from bottom to top. If     \n
       not specified, it is calculated as 1:1:SLICE_ORDER.           \n
                                                                     \n
-    5. REFERENCE_SLICE: The reference slice for slice-timing. By     \n
+    5. REFERENCE_SLICE: The reference slice for slice-timing. By    \n
      default, REFERENCE_SLICE = 1.                                  \n
+                                                                    \n
+    8.  FUNC_FOLDER: The name of the folder where the raw           \n
+     functional data is stored. By default, FUNC_FOLDER = raw.      \n
+                                                                    \n
+    7. STRUCT_FOLDER: The name of the folder where the structural   \n
+     images are stored. By default, STRUCT_FOLDER = struct          \n
 "
 
 J=1
@@ -125,6 +137,8 @@ NUM_SLICES=36
 TA="${TR}-${TR}/${NUM_SLICES}"
 SLICE_ORDER="1:1:${NUM_SLICES}"
 REFERENCE_SLICE=1
+FUNC_FOLDER=raw
+STRUCT_FOLDER=struct
 
 if [ -f $1 ]; then
     param_file=$1
@@ -157,7 +171,17 @@ if [ -f $1 ]; then
 	REFERENCE_SLICE=`grep "^REFERENCE_SLICE" ${param_file} | cut -f2 -d= | tail -1 | tr -d ' '`
 	echo "  Setting parameter REFERENCE_SLICE = $REFERENCE_SLICE" >&2
     fi
-   
+
+    if grep -q "^FUNC_FOLDER" $param_file; then
+	FUNC_FOLDER=`grep "^FUNC_FOLDER" ${param_file} | cut -f2 -d= | tail -1 | tr -d ' '`
+	echo "  Setting parameter FUNC_FOLDER = $FUNC_FOLDER" >&2
+    fi
+
+    if grep -q "^STRUCT_FOLDER" $param_file; then
+	FUNC_FOLDER=`grep "^STRUCT_FOLDER" ${param_file} | cut -f2 -d= | tail -1 | tr -d ' '`
+	echo "  Setting parameter STRUCT_FOLDER = $STRUCT_FOLDER" >&2
+    fi
+
     # Finally, skip the first argument
     shift
 fi
@@ -171,7 +195,7 @@ for subj in $@; do
     # Part 1: Time slice correction
 
     echo "matlabbatch{$J}.spm.temporal.st.scans = {"
-    cd ${subj}/raw
+    cd ${subj}/${FUNC_FOLDER}
 
     # Find the number of sessions
     num_sess=`ls ${subj}[-_]*.nii | wc | awk '{print $1}'`
@@ -189,7 +213,7 @@ for subj in $@; do
 	N=`fslinfo $file | cut grep dim4 | awk '{print $2}'`
 	#echo $N >&2
 	for ((image=1; image<N; ++image)); do 
-	    echo "'${base}/${subj}/raw/${session},${image}'"
+	    echo "'${base}/${subj}/${FUNC_FOLDER}/${session},${image}'"
 	done
 	echo "}"
     done
@@ -291,7 +315,7 @@ for subj in $@; do
     
     echo -e "\n% Normalize: Write\n"
 
-    cd ../raw;
+    cd ../${FUNC_FOLDER};
     S=1
     for session in ${subj}[-_]*.nii; do
 	echo "matlabbatch{$J}.spm.spatial.normalise.write.subj($S).matname(1) = cfg_dep;"
@@ -349,7 +373,7 @@ for subj in $@; do
 	J=$((J+1))
     done
     
-    # Exit the subject's RAW folder, goes back to base
+    # Exit the subject's FUNCT_FOLDER folder, goes back to base
     cd ../..
 done
 
