@@ -178,7 +178,7 @@ if [ -f $1 ]; then
     fi
 
     if grep -q "^STRUCT_FOLDER" $param_file; then
-	FUNC_FOLDER=`grep "^STRUCT_FOLDER" ${param_file} | cut -f2 -d= | tail -1 | tr -d ' '`
+	STRUCT_FOLDER=`grep "^STRUCT_FOLDER" ${param_file} | cut -f2 -d= | tail -1 | tr -d ' '`
 	echo "  Setting parameter STRUCT_FOLDER = $STRUCT_FOLDER" >&2
     fi
 
@@ -196,11 +196,11 @@ for subj in $@; do
 
     echo "matlabbatch{$J}.spm.temporal.st.scans = {"
     cd ${subj}/${FUNC_FOLDER}
-
+    echo `pwd` >&2
     # Find the number of sessions
     num_sess=`ls ${subj}[-_]*.nii | wc | awk '{print $1}'`
     if [ $num_sess -eq 0 ]; then
-	echo "** Error ** No sessions found for subject ${subj}" >&2
+	echo "** Error ** No sessions found for subject ${subj} folder ${FUNCT_FOLDER}" >&2
     else
 	echo "Found $num_sess sessions for subject ${subj}" >&2
     fi
@@ -209,9 +209,9 @@ for subj in $@; do
 	echo "% Session $session"
 	echo "{"
 	#N=`echo $session | cut -f1 -d. | tail -c 4`
-	#N=$(echo $N | sed 's/^0*//')   # Removes leading zeroes
-	N=`fslinfo $file | cut grep dim4 | awk '{print $2}'`
-	#echo $N >&2
+	#N=$(#echo $N | sed 's/^0*//')  # Removes leading zeroes
+	N=`fslinfo $session | grep "^dim4" | awk '{print $2}'`
+	#echo "N=$N" >&2
 	for ((image=1; image<N; ++image)); do 
 	    echo "'${base}/${subj}/${FUNC_FOLDER}/${session},${image}'"
 	done
@@ -265,7 +265,7 @@ for subj in $@; do
     J=$((J+1))
     echo -e "\n% Coregistration\n"
 
-    cd ../struct;
+    cd ../${STRUCT_FOLDER};
     struct=`ls ${subj}*.nii`
 
     echo "matlabbatch{$J}.spm.spatial.coreg.estwrite.ref(1) = cfg_dep;"
@@ -277,7 +277,7 @@ for subj in $@; do
     echo "matlabbatch{$J}.spm.spatial.coreg.estwrite.ref(1).sname = 'Realign: Estimate & Reslice: Mean Image';"
     echo "matlabbatch{$J}.spm.spatial.coreg.estwrite.ref(1).src_exbranch = substruct('.','val', '{}',{$((J-1))}, '.','val', '{}',{1}, '.','val', '{}',{1}, '.','val', '{}',{1});"
     echo "matlabbatch{$J}.spm.spatial.coreg.estwrite.ref(1).src_output = substruct('.','rmean');"
-    echo "matlabbatch{$J}.spm.spatial.coreg.estwrite.source = {'${base}/${subj}/struct/${struct},1'};"
+    echo "matlabbatch{$J}.spm.spatial.coreg.estwrite.source = {'${base}/${subj}/${STRUCT_FOLDER}/${struct},1'};"
     echo "matlabbatch{$J}.spm.spatial.coreg.estwrite.other = {''};"
     echo "matlabbatch{$J}.spm.spatial.coreg.estwrite.eoptions.cost_fun = 'nmi';"
     echo "matlabbatch{$J}.spm.spatial.coreg.estwrite.eoptions.sep = [4 2];"

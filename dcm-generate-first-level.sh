@@ -278,6 +278,24 @@ for subj in "$@" ; do
     echo "matlabbatch{$J}.spm.stats.fmri_spec.sess($S).multi = {'${base}/${subj}/behav/sessions_dcm.mat'};"
     echo "matlabbatch{$J}.spm.stats.fmri_spec.sess($S).regress = struct('name', {}, 'val', {});"
 
+    # for k in sessions
+    K=1
+    for session in `ls sw*.nii`; do
+	echo "matlabbatch{1}.spm.stats.fmri_spec.sess.regress($K).name = 'Session $K';"
+	echo -n "matlabbatch{1}.spm.stats.fmri_spec.sess.regress($K).val = ["
+	for sess in `ls sw*.nii`; do
+	    L=`fslinfo $sess | grep "^dim4" | awk '{print $2}'`
+	    if [ "$sess" == "$session" ]; then
+		echo -n "ones(1,$L),"
+	    else
+		echo -n "zeros(1,$L),"
+	    fi
+	done
+	echo "];"
+	K=$((K+1))
+    done
+  
+    echo "matlabbatch{1}.spm.stats.fmri_spec.sess.multi_reg = {''};"
     echo "matlabbatch{$J}.spm.stats.fmri_spec.sess($S).hpf = ${HPF};"
 	
     S=$((S+1))
@@ -335,7 +353,7 @@ for subj in "$@" ; do
     echo "matlabbatch{$J}.spm.stats.con.consess{$C}.fcon.convec = {"
     #echo "                                                       [1 0"
     #echo "                                                        0 1]"
-    echo "                                                        eye(${C})"
+    echo "                                                        eye($((C-1)))"
     echo "                                                       }';"
 
     echo "matlabbatch{$J}.spm.stats.con.consess{$C}.fcon.sessrep = 'none';"
