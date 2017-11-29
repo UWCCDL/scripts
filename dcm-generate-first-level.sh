@@ -186,6 +186,8 @@ TR=2
 CONTRAST_MANAGEMENT=replsc
 HPF=128
 MOTION_REGRESSORS=0
+FUNC_FOLDER=raw
+STRUCT_FOLDER=struct
 
 # ------------------------------------------------------------------ #
 # Load params (if any)
@@ -220,7 +222,16 @@ if [ $# -gt 0 ]; then
 	    MOTION_REGRESSORS=`grep '^MOTION_REGRESSORS' ${param_file} | cut -f2 -d= | tail -1 | tr -d " '"`
 	    echo "  Setting MOTION_REGRESSORS to $MOTION_REGRESSORS" >&2 
 	fi
-
+	
+	if grep -q "^FUNC_FOLDER" $param_file; then
+	    FUNC_FOLDER=`grep "^FUNC_FOLDER" ${param_file} | cut -f2 -d= | tail -1 | tr -d ' '`
+	    echo "  Setting parameter FUNC_FOLDER = $FUNC_FOLDER" >&2
+	fi
+	
+	if grep -q "^STRUCT_FOLDER" $param_file; then
+	    STRUCT_FOLDER=`grep "^STRUCT_FOLDER" ${param_file} | cut -f2 -d= | tail -1 | tr -d ' '`
+	    echo "  Setting parameter STRUCT_FOLDER = $STRUCT_FOLDER" >&2
+	fi
 
         # Finally, skip the first argument
 	shift 1
@@ -249,7 +260,7 @@ J=1
 for subj in "$@" ; do
     echo "Generating model for $subj" >&2
     [ -d $subj ] || continue
-    cd ${subj}/raw
+    cd ${subj}/${FUNC_FOLDER}
     
     echo "matlabbatch{$J}.spm.stats.fmri_spec.timing.units = 'secs';"
     echo "matlabbatch{$J}.spm.stats.fmri_spec.timing.RT = ${TR};"
@@ -265,11 +276,15 @@ for subj in "$@" ; do
 
     for session in `ls sw*.nii`; do
 	
-	N=`echo $session | cut -f1 -d. | tail -c 4`
-	N=$(echo $N | sed 's/^0*//')   # Removed leading zeroes
-
-	for ((image=1; image<N; ++image)); do 
-	    echo "'${base}/${subj}/raw/${session},${image}'"
+	#N=`echo $session | cut -f1 -d. | tail -c 4`
+	#N=`fslinfo $session | grep "^dim4" | awk '{print $2}'`
+	N=`niftidims.py $session | awk '{print $4}'`
+	#N=$(echo $N | sed 's/^0*//')   # Removed leading zeroes
+	
+	# Note that this loops stops at image<=N, not image<N,
+	# because the number of volumes comes from the header
+	for ((image=1; image<=N; ++image)); do 
+	    echo "'${base}/${subj}/${FUNC_FOLDER}/${session},${image}'"
 	done
     done
 

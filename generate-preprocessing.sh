@@ -210,7 +210,8 @@ for subj in $@; do
 	echo "{"
 	#N=`echo $session | cut -f1 -d. | tail -c 4`
 	#N=$(#echo $N | sed 's/^0*//')  # Removes leading zeroes
-	N=`fslinfo $session | grep "^dim4" | awk '{print $2}'`
+	#N=`fslinfo $session | grep "^dim4" | awk '{print $2}'`
+	N=`niftidims.py $session | awk '{print $4}'`
 	#echo "N=$N" >&2
 	for ((image=1; image<N; ++image)); do 
 	    echo "'${base}/${subj}/${FUNC_FOLDER}/${session},${image}'"
