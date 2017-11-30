@@ -299,7 +299,8 @@ for subj in "$@" ; do
 	echo "matlabbatch{1}.spm.stats.fmri_spec.sess.regress($K).name = 'Session $K';"
 	echo -n "matlabbatch{1}.spm.stats.fmri_spec.sess.regress($K).val = ["
 	for sess in `ls sw*.nii`; do
-	    L=`fslinfo $sess | grep "^dim4" | awk '{print $2}'`
+	    #L=`fslinfo $sess | grep "^dim4" | awk '{print $2}'`
+	    L=`niftidims.py $sess | awk '{print $4}'`
 	    if [ "$sess" == "$session" ]; then
 		echo -n "ones(1,$L),"
 	    else

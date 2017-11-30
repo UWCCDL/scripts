@@ -62,6 +62,8 @@
 #
 # History
 # -------
+#  2017-11-28 : * Replaced FSLInfo with custom-made niftidims.py
+#
 #  2017-11-25 : * Implemented a new way to read the number of volumes
 #             :   In a 4D nifti file (based on FSLinfo).
 #

@@ -147,6 +147,12 @@ HLP_MSG="
      (=1) the motion parameters as additional regressors. Default
      is MOTION_REGRESSORS = 0.
 
+   * FUNC_FOLDER: The name of the folder where the raw         
+     functional data is stored. By default, FUNC_FOLDER = raw. 
+                                                               
+   * STRUCT_FOLDER: The name of the folder where the structural
+     images are stored. By default, STRUCT_FOLDER = struct     
+
  Contrast File
  --------------
  A contrast file is a text file that contains contrast names and 
@@ -198,6 +204,8 @@ TR=2
 CONTRAST_MANAGEMENT=replsc
 HPF=128
 MOTION_REGRESSORS=0
+FUNC_FOLDER=raw
+STRUCT_FOLDER=struct
 
 # ------------------------------------------------------------------ #
 # Load params (if any)
@@ -233,7 +241,15 @@ if [ $# -gt 0 ]; then
 	    echo "  Setting MOTION_REGRESSORS to $MOTION_REGRESSORS" >&2 
 	fi
 
+	if grep -q "^FUNC_FOLDER" $param_file; then
+	    FUNC_FOLDER=`grep "^FUNC_FOLDER" ${param_file} | cut -f2 -d= | tail -1 | tr -d ' '`
+	    echo "  Setting parameter FUNC_FOLDER = $FUNC_FOLDER" >&2
+	fi
 
+	if grep -q "^STRUCT_FOLDER" $param_file; then
+	    STRUCT_FOLDER=`grep "^STRUCT_FOLDER" ${param_file} | cut -f2 -d= | tail -1 | tr -d ' '`
+	    echo "  Setting parameter STRUCT_FOLDER = $STRUCT_FOLDER" >&2
+	fi
         # Finally, skip the first argument
 	shift 1
     fi
@@ -261,7 +277,7 @@ J=1
 for subj in "$@" ; do
     echo "Generating model for $subj" >&2
     [ -d $subj ] || continue
-    cd ${subj}/raw
+    cd ${subj}/${FUNC_FOLDER}
     
     echo "matlabbatch{$J}.spm.stats.fmri_spec.timing.units = 'secs';"
     echo "matlabbatch{$J}.spm.stats.fmri_spec.timing.RT = ${TR};"
@@ -274,11 +290,12 @@ for subj in "$@" ; do
     for session in `ls sw*.nii`; do
 	echo "matlabbatch{$J}.spm.stats.fmri_spec.sess($S).scans = {"
 
-	N=`echo $session | cut -f1 -d. | tail -c 4`
-	N=$(echo $N | sed 's/^0*//')   # Removed leading zeroes
-
-	for ((image=1; image<N; ++image)); do 
-	    echo "'${base}/${subj}/raw/${session},${image}'"
+	#N=`echo $session | cut -f1 -d. | tail -c 4`
+	#N=$(echo $N | sed 's/^0*//')   # Removed leading zeroes
+	N=`niftidims.py $session | awk '{print $4}'`
+	# modified image<N to image<=N to accommodate for new niftidims dimensions.
+	for ((image=1; image<=N; ++image)); do 
+	    echo "'${base}/${subj}/${FUNC_FOLDER}/${session},${image}'"
 	done
 
 	echo "};"
@@ -289,7 +306,7 @@ for subj in "$@" ; do
 	# If MOTION_REGRESSORS is true,
 	if [ $MOTION_REGRESSORS != 0 ]; then
 	    mot_params=`ls rp_*.txt | head -${S} | tail -1`
-	    echo "matlabbatch{$J}.spm.stats.fmri_spec.sess($S).multi_reg = {'${base}/${subj}/raw/${mot_params}'};"
+	    echo "matlabbatch{$J}.spm.stats.fmri_spec.sess($S).multi_reg = {'${base}/${subj}/${FUNC_FOLDER}/${mot_params}'};"
 	else
 	    echo "matlabbatch{$J}.spm.stats.fmri_spec.sess($S).multi_reg = {''};"
 	fi	

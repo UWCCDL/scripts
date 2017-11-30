@@ -164,7 +164,7 @@ HLP_MSG="
 ## ---------------------------------------------------------------- ##
 J=0
 DIR=`pwd`
-M="${DIR}/group-analysis.m"
+#M="${DIR}/group-analysis.m"
 #echo "%% Starting... " > ${M}
 
 L1_RESULTS_FOLDER=$1
