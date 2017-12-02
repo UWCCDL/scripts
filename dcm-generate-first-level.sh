@@ -370,7 +370,7 @@ for subj in "$@" ; do
     #echo "                                                       [1 0"
     #echo "                                                        0 1]"
     echo "                                                        eye($((C-1)))"
-    echo "                                                       }';"
+    echo "                                                       };"
 
     echo "matlabbatch{$J}.spm.stats.con.consess{$C}.fcon.sessrep = 'none';"
     echo "matlabbatch{$J}.spm.stats.con.delete = 1;"
