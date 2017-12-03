@@ -295,13 +295,19 @@ for subj in "$@" ; do
 
     # for k in sessions
     K=1
-    for session in `ls sw*.nii`; do
-	echo "matlabbatch{1}.spm.stats.fmri_spec.sess.regress($K).name = 'Session $K';"
-	echo -n "matlabbatch{1}.spm.stats.fmri_spec.sess.regress($K).val = ["
+    NS=`ls sw*.nii | wc | awk '{print $1}'`
+    NS=$((NS - 1))
+    # If NS > 0; else regressors is empty
+    # for (, i < NS, i++)
+    for ((s=1; s<=NS; ++s)); do 
+	echo "matlabbatch{$J}.spm.stats.fmri_spec.sess.regress($K).name = 'Session $s';"
+	echo -n "matlabbatch{$J}.spm.stats.fmri_spec.sess.regress($K).val = ["
+	k=0
 	for sess in `ls sw*.nii`; do
+	    k=$((k + 1))
 	    #L=`fslinfo $sess | grep "^dim4" | awk '{print $2}'`
 	    L=`niftidims.py $sess | awk '{print $4}'`
-	    if [ "$sess" == "$session" ]; then
+	    if [ "$k" == "$s" ]; then
 		echo -n "ones(1,$L),"
 	    else
 		echo -n "zeros(1,$L),"
@@ -311,7 +317,7 @@ for subj in "$@" ; do
 	K=$((K+1))
     done
   
-    echo "matlabbatch{1}.spm.stats.fmri_spec.sess.multi_reg = {''};"
+    echo "matlabbatch{$J}.spm.stats.fmri_spec.sess.multi_reg = {''};"
     echo "matlabbatch{$J}.spm.stats.fmri_spec.sess($S).hpf = ${HPF};"
 	
     S=$((S+1))
