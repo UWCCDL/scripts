@@ -1,6 +1,6 @@
 #!/bin/bash
 # ------------------------------------------------------------------ #
-# GENERATE-FIRST-LEVEL
+# DCM-GENERATE-FIRST-LEVEL
 # ------------------------------------------------------------------ #
 # Generates a 1st level model SPM/Matlab script, which is output on
 # the terminal and can be saved on a .m file.
@@ -8,7 +8,7 @@
 # Usage
 # -----
 #
-#   $ generate-first-level.sh [param_file] <results_dir> 
+#   $ dcm-generate-first-level.sh [param_file] <results_dir> 
 #                             <contrast_file>
 #                             <subj1> <subj2>...<subjN>
 #
@@ -93,7 +93,7 @@ HLP_MSG="
  Usage
  -----
 
-   $ generate-first-level.sh [param_file] <results_dir> 
+   $ dcm-generate-first-level.sh [param_file] <results_dir> 
                              <contrast_file>
                              <subj1> <subj2>...<subjN>
 
@@ -172,7 +172,7 @@ HLP_MSG="
  Summary
  -------
 
-   $ generate-first-level.sh [param_file] <results_dir> 
+   $ dcm-generate-first-level.sh [param_file] <results_dir> 
                              <contrast_file>
                              <subj1> <subj2>...<subjN>
 
@@ -182,9 +182,9 @@ HLP_MSG="
 # General variabls
 # ------------------------------------------------------------------ #
 
-TR=2
+TR=2.0
 CONTRAST_MANAGEMENT=replsc
-HPF=128
+HPF=256
 MOTION_REGRESSORS=0
 FUNC_FOLDER=raw
 STRUCT_FOLDER=struct
@@ -373,8 +373,6 @@ for subj in "$@" ; do
     # Add F-contrast Effects of Interest
     echo "matlabbatch{$J}.spm.stats.con.consess{$C}.fcon.name = 'EoI';"
     echo "matlabbatch{$J}.spm.stats.con.consess{$C}.fcon.convec = {"
-    #echo "                                                       [1 0"
-    #echo "                                                        0 1]"
     echo "                                                        eye($((C-1)))"
     echo "                                                       };"
 
