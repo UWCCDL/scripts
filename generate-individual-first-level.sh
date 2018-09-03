@@ -142,11 +142,6 @@ rescaled nor repeated per session.
   2. The data for each subject is contained in folder that has
      the same name as the subject;
     
- In addition, the script assumes that:
-  
- 3. the contrast vector can be replicated and scaled across 
-    sessions.
-
  Do not use the script unless all of the above assumptions are true.
 
  Summary
