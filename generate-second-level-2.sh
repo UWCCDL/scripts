@@ -227,7 +227,7 @@ while read contrast; do
     
     while read subject; do
 	subject_folder=`echo $subject | awk '{print $1}'`
-	contrast_file=con_`printf "%04d" ${C}`.img
+	contrast_file=con_`printf "%04d" ${C}`.nii
 	
 	if [ ! -e ${DIR}/${subject_folder}/do-not-include.txt ]; then
 	    if [ -e ${DIR}/${subject_folder}/${L1_RESULTS_FOLDER}/${contrast_file} ]; then
@@ -368,7 +368,7 @@ if [ $N == 2 ]; then
 	    contrast_name=`echo $contrast | cut -f1 -d':'`
 	    contrast_name=`echo ${contrast_name}`
 	    contrast_dir=${contrast_name// /_}     # Subtitute spaces with '_'
-	    contrast_file=con_`printf "%04d" ${C}`.img
+	    contrast_file=con_`printf "%04d" ${C}`.nii
 
 	    if [ ! -d ${DIR}/${L2_RESULTS_FOLDER}/${group}/${contrast_dir} ]; then
 		echo "Warning: Creating '${contrast_dir}' folder" >&2
@@ -519,7 +519,7 @@ if [ $N == 2 ]; then
 	contrast_name=`echo $contrast | cut -f1 -d':'`
 	contrast_name=`echo ${contrast_name}`
 	contrast_dir=${contrast_name// /_}     # Subtitute spaces with '_'
-	contrast_file=con_`printf "%04d" ${C}`.img
+	contrast_file=con_`printf "%04d" ${C}`.nii
 
 	if [ ! -d ${DIR}/${L2_RESULTS_FOLDER}/comparisons/${contrast_dir} ]; then
 	    echo "Warning: Creating '${contrast_dir}' folder" >&2

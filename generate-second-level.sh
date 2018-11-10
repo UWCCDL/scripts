@@ -76,6 +76,9 @@
 # History
 # -------
 #
+#  2018-11-10 : * Adapted to handle *.nii nifti files (new standard
+#             :   in SPM12).
+#
 #  2014-05-13 : * File created, as a fork of previous script
 #             :   called generate-group-analysis
 #
@@ -224,11 +227,13 @@ while read contrast; do
     
     while read subject; do
 	subject_folder=`echo $subject | awk '{print $1}'`
-	contrast_file=con_`printf "%04d" ${C}`.img
+	contrast_file=con_`printf "%04d" ${C}`
 	
 	if [ ! -e ${DIR}/${subject_folder}/do-not-include.txt ]; then
-	    if [ -e ${DIR}/${subject_folder}/${L1_RESULTS_FOLDER}/${contrast_file} ]; then
-		echo "'${DIR}/${subject_folder}/${L1_RESULTS_FOLDER}/${contrast_file},1'" 
+	    if [ -e ${DIR}/${subject_folder}/${L1_RESULTS_FOLDER}/${contrast_file}.img ]; then
+		echo "'${DIR}/${subject_folder}/${L1_RESULTS_FOLDER}/${contrast_file}.img,1'"
+	    elif [ -e ${DIR}/${subject_folder}/${L1_RESULTS_FOLDER}/${contrast_file}.nii ]; then
+		echo "'${DIR}/${subject_folder}/${L1_RESULTS_FOLDER}/${contrast_file}.nii,1'"
 	    else
 		echo "No contrast file ${contrast_file} for ${subject_folder}: Subject excluded" >&2
 	    fi
@@ -316,7 +321,7 @@ if [ $N == 2 ]; then
 	    contrast_name=`echo $contrast | cut -f1 -d':'`
 	    contrast_name=`echo ${contrast_name}`
 	    contrast_dir=${contrast_name// /_}     # Subtitute spaces with '_'
-	    contrast_file=con_`printf "%04d" ${C}`.img
+	    contrast_file=con_`printf "%04d" ${C}`
 
 	    if [ ! -d ${DIR}/${L2_RESULTS_FOLDER}/${group}/${contrast_dir} ]; then
 		echo "Warning: Creating '${contrast_dir}' folder" >&2
@@ -333,8 +338,14 @@ if [ $N == 2 ]; then
 	    for subject in `grep ${group} ${GROUP_FILE} | awk '{print $1}'`; do
 		#echo "   $subject"
 		if [ ! -e ${DIR}/${subject}/do-not-include.txt ]; then
-		    if [ -e ${DIR}/${subject}/${L1_RESULTS_FOLDER}/${contrast_file} ]; then
-			echo "'${DIR}/${subject}/${L1_RESULTS_FOLDER}/${contrast_file},1'" 
+		    if [ -e ${DIR}/${subject}/${L1_RESULTS_FOLDER}/${contrast_file}.img ]; then
+			# This handles Analyze format / SPM5-8
+			echo "'${DIR}/${subject}/${L1_RESULTS_FOLDER}/${contrast_file}.img,1'"
+			
+		    elif [ -e ${DIR}/${subject}/${L1_RESULTS_FOLDER}/${contrast_file}.nii} ]; then
+			# This handles Nifti format / SPM12
+			echo "'${DIR}/${subject}/${L1_RESULTS_FOLDER}/${contrast_file}.nii,1'"
+
 		    else
 			echo "No contrast file ${contrast_file} for ${subject}: Subject excluded" >&2
 		    fi
@@ -421,7 +432,7 @@ if [ $N == 2 ]; then
 	contrast_name=`echo $contrast | cut -f1 -d':'`
 	contrast_name=`echo ${contrast_name}`
 	contrast_dir=${contrast_name// /_}     # Subtitute spaces with '_'
-	contrast_file=con_`printf "%04d" ${C}`.img
+	contrast_file=con_`printf "%04d" ${C}`
 
 	if [ ! -d ${DIR}/${L2_RESULTS_FOLDER}/comparisons/${contrast_dir} ]; then
 	    echo "Warning: Creating '${contrast_dir}' folder" >&2
@@ -443,8 +454,10 @@ if [ $N == 2 ]; then
 	
 	for subject in `grep ${group1} ${GROUP_FILE} | awk '{print $1}'`; do
 	    if [ ! -e ${DIR}/${subject}/do-not-include.txt ]; then
-		if [ -e ${DIR}/${subject}/${L1_RESULTS_FOLDER}/${contrast_file} ]; then
-		    echo "'${DIR}/${subject}/${L1_RESULTS_FOLDER}/${contrast_file},1'" 
+		if [ -e ${DIR}/${subject}/${L1_RESULTS_FOLDER}/${contrast_file}.img ]; then
+		    echo "'${DIR}/${subject}/${L1_RESULTS_FOLDER}/${contrast_file}.img,1'"
+		elif [ -e ${DIR}/${subject}/${L1_RESULTS_FOLDER}/${contrast_file}.nii ]; then
+		    echo "'${DIR}/${subject}/${L1_RESULTS_FOLDER}/${contrast_file}.nii,1'"
 		else
 		    echo "No contrast file ${contrast_file} for ${subject}: Subject excluded" >&2
 		fi
