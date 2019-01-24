@@ -113,6 +113,19 @@ Note that the connection between the second and the third term MUST
 have already been specified when you use the three-term statement, 
 i.e. in order to describe 'A -> B -> C', you need to have specified
 'B -> C' first.
+
+Usage
+-----
+  $ dcm-generate-models.py <model_file> <dcm_dir> <subj1> <subj2> ... <subjN>
+
+Where:
+   
+  <model_file> is the file containing the model description (see
+    below)
+  <dcm_dir> is the name of the folder where the single-subject  
+    SPM.mat file is located (and where the DCM model will be 
+    saved)
+  <subjN> is the name of the folder corresponding to each subject.
 """
 
 import sys, copy, os, ntpath

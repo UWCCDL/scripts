@@ -80,7 +80,12 @@ HLP_MSG='
     voxel values are filtered.                                        \n
  8. LOCATION TYPE. A binary value, determining whether the location   \n
     of the VOI is fixed (0) or it is moved to closest activation      \n
-    peak (1).'
+    peak (1).                                                         \n
+                                                                      \n
+Usage:                                                                \n
+                                                                      \n
+   $ dcm-generate-vois.sh <VOI_file> <subj1> <subj2> ... <subjN>.     \n'
+
 
 VOI_FILE=$1
 #MFILE=`pwd`/create_vois_${VOI_FILE}_`date +%Y_%m_%d_%H%M`.m

@@ -475,8 +475,10 @@ if [ $N == 2 ]; then
 	
 	for subject in `grep ${group2} ${GROUP_FILE} | awk '{print $1}'`; do
 	    if [ ! -e ${DIR}/${subject}/do-not-include.txt ]; then
-		if [ -e ${DIR}/${subject}/${L1_RESULTS_FOLDER}/${contrast_file} ]; then
-		    echo "'${DIR}/${subject}/${L1_RESULTS_FOLDER}/${contrast_file},1'" 
+		if [ -e ${DIR}/${subject}/${L1_RESULTS_FOLDER}/${contrast_file}.img ]; then
+		    echo "'${DIR}/${subject}/${L1_RESULTS_FOLDER}/${contrast_file}.img,1'"
+		elif [ -e ${DIR}/${subject}/${L1_RESULTS_FOLDER}/${contrast_file}.nii ]; then
+		    echo "'${DIR}/${subject}/${L1_RESULTS_FOLDER}/${contrast_file}.nii,1'"
 		else
 		    echo "No contrast file ${contrast_file} for ${subject}: Subject excluded"  >&2
 		fi
